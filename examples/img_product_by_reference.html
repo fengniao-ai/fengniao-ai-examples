@@ -107,7 +107,7 @@
         .then(data => {
             resp.style.display = 'block'
             jsonDisplay.textContent = JSON.stringify(data, null, 2);
-            if (data.code == 0) {
+            if (data.code == 200) {
                 iframeUrl = data.result.url
             }
         })
