@@ -8,7 +8,7 @@ After cloning this repository, you can simply open the files in a browser to see
 
 ## Live Examples
 
-You can also visit the live project here: [fengniao-ai.github.io](https://fengniao-ai.github.io/)
+You can also visit the live project here: [fengniao-ai.github.io/fengniao-ai-examples/](ttps://fengniao-ai.github.io/fengniao-ai-examples/)
 
 ## Obtain API Key
 
