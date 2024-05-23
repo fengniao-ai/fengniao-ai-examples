@@ -1,1 +1,127 @@
-img_product_by_reference
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场景生成</title>
+    <style>
+        html,body,p{
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            padding: 20px;
+            height: calc(100vh - 40px);
+        }
+        .l-panel {
+            width: 240px;
+            margin-right: 20px;
+            border-right: 1px solid rgb(93, 90, 90);
+        }
+        .doc, .resp-panel, .form  {
+            margin-bottom: 15px;
+        }
+        .resp-panel {
+            display: none;
+        }
+
+        .btn{
+            width: 80px;
+            margin: 15px 0;
+        }
+        .input {
+            width: 220px;
+        }
+        pre{
+            overflow: auto;
+        }
+
+        .r-panel {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="l-panel">
+            <form id="myForm" class="form">
+                <div class="form-item">
+                    <p>PROJET ID:</p>
+                    <input class="input" name="appid" type="text" value="oSHO7wC2Z68RH6r8mRBgX" required>
+                </div>
+                <div class="form-item">
+                    <p>API KEY:</p>
+                    <input class="input" name="appkey" type="text" value="MJlLJn2vl5OlT653xmO7wE1MQFh0WMS8" required>
+                </div>
+                <div class="form-item">
+                    <p>有效时间:</p>
+                    <input class="input" name="expires_in" type="number">
+                </div>
+                <button class="btn" id="generateBtn">生成</button>
+            </form>
+            <div id="resp" class="resp-panel">
+                <p>JSON 返回值</p>
+                <pre><code id="jsonDisplay">{a:1}</code></pre>
+                <button class="btn" id="previewBtn">点击预览</button>
+            </div>
+            <div class="doc">
+                <a href="">完整手册</a>
+                <a href="">下载demo</a>
+            </div>
+        </div>
+        <div class="r-panel">
+            <iframe id="iframe" src="" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+</body>
+<script>
+    function pageLoaded(){
+        var BASE_URL = ''
+        // var BASE_URL = 'http://localhost:5000';
+        var WEB_COMPONENT_NAME = '场景生成A';
+        var previewBtn = document.getElementById('previewBtn');
+        var iframe = document.getElementById('iframe');
+        var resp = document.getElementById('resp');
+        var myForm = document.getElementById('myForm');
+        var jsonDisplay = document.getElementById('jsonDisplay');
+        var iframeUrl = ''
+
+        myForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            // 获取表单数据
+            const formData = new FormData(event.target);
+            const data = {
+                name: WEB_COMPONENT_NAME,
+                expires_in: formData.get('expires_in')
+            };
+            // 使用 fetch 提交表单数据
+        fetch(BASE_URL + '/api/v1/getWebComponent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + formData.get('appkey'),
+                'Fengniaoao-Project': formData.get('appid')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            resp.style.display = 'block'
+            jsonDisplay.textContent = JSON.stringify(data, null, 2);
+            if (data.code == 0) {
+                iframeUrl = data.result.url
+            }
+        })
+        .catch(error => {
+            resp.style.display = 'block'
+            jsonDisplay.textContent = error
+        });
+        })
+        previewBtn.addEventListener('click', function(){
+            iframe.src = iframeUrl
+        })
+    }
+    document.addEventListener('DOMContentLoaded', pageLoaded)
+
+</script>
+</html>
