@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能抠图</title>
+    <style>
+        html,body,p{
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            padding-left: 20px;
+            height: 100vh;
+        }
+        .l-panel {
+            width: 240px;
+            margin-right: 20px;
+            border-right: 1px solid rgb(93, 90, 90);
+        }
+        .doc, .resp-panel, .form  {
+            margin-bottom: 15px;
+        }
+        .resp-panel {
+            display: none;
+        }
+
+        .btn{
+            width: 80px;
+            margin: 15px 0;
+        }
+        .input {
+            width: 220px;
+        }
+        pre{
+            overflow: auto;
+        }
+
+        .r-panel {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="l-panel">
+            <form id="myForm" class="form">
+                <div class="form-item">
+                    <p>PROJET ID:</p>
+                    <input class="input" name="appid" type="text" value="" required>
+                </div>
+                <div class="form-item">
+                    <p>API KEY:</p>
+                    <input class="input" name="appkey" type="text" value="" required>
+                </div>
+                <div class="form-item">
+                    <p>存活时间(秒）:</p>
+                    <input class="input" name="expires_in" value="3600" type="number">
+                </div>
+                <button class="btn" id="generateBtn">生成</button>
+            </form>
+            <div id="resp" class="resp-panel">
+                <p>JSON 返回值</p>
+                <pre><code id="jsonDisplay"></code></pre>
+                <button class="btn" id="previewBtn">点击预览</button>
+            </div>
+            <div class="doc">
+                <a href="https://tn3e1qv394.feishu.cn/docx/Gx9MdktExocti2xqOcIcK0tXnRc">API手册</a>
+                <a href="https://github.com/fengniao-ai/fengniao-ai-examples">下载demo</a>
+            </div>
+        </div>
+        <div class="r-panel">
+            <iframe id="iframe" src="" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+</body>
+<script>
+    function pageLoaded(){
+        var BASE_URL = 'https://api.fengniao.ai';
+        var WEB_COMPONENT_NAME = 'img_cutout';
+        var previewBtn = document.getElementById('previewBtn');
+        var iframe = document.getElementById('iframe');
+        var resp = document.getElementById('resp');
+        var myForm = document.getElementById('myForm');
+        var jsonDisplay = document.getElementById('jsonDisplay');
+        var iframeUrl = ''
+
+        myForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            // 获取表单数据
+            const formData = new FormData(event.target);
+            const data = {
+                name: WEB_COMPONENT_NAME,
+                expires_in: formData.get('expires_in')
+            };
+            // 使用 fetch 提交表单数据
+        fetch(BASE_URL + '/api/v1/getWebComponent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + formData.get('appkey'),
+                'Fengniaoao-Project': formData.get('appid')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            resp.style.display = 'block'
+            jsonDisplay.textContent = JSON.stringify(data, null, 2);
+            if (data.code == 200) {
+                iframeUrl = data.result.url
+            }
+        })
+        .catch(error => {
+            resp.style.display = 'block'
+            jsonDisplay.textContent = error
+        });
+        })
+        previewBtn.addEventListener('click', function(){
+            iframe.src = iframeUrl
+        })
+    }
+    document.addEventListener('DOMContentLoaded', pageLoaded)
+
+</script>
+</html>
