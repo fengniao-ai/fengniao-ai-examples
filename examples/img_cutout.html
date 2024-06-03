@@ -75,8 +75,13 @@
     </div>
 </body>
 <script>
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
     function pageLoaded(){
-        var BASE_URL = 'https://api.fengniao.ai';
+        var env = getQueryParam('env')
+        var BASE_URL = env == 'uat' ? 'https://api.port2.cn' : 'https://api.fengniao.ai'
         var WEB_COMPONENT_NAME = 'img_cutout';
         var previewBtn = document.getElementById('previewBtn');
         var iframe = document.getElementById('iframe');
@@ -85,36 +90,39 @@
         var jsonDisplay = document.getElementById('jsonDisplay');
         var iframeUrl = ''
 
+        document.querySelector('input[name="appid"]').value = getQueryParam('id')
+        document.querySelector('input[name="appkey"]').value = getQueryParam('key')
+
         myForm.addEventListener('submit', function(e){
             e.preventDefault();
             // 获取表单数据
-            const formData = new FormData(event.target);
-            const data = {
+            var formData = new FormData(event.target);
+            var data = {
                 name: WEB_COMPONENT_NAME,
                 expires_in: formData.get('expires_in')
             };
             // 使用 fetch 提交表单数据
-        fetch(BASE_URL + '/api/v1/getWebComponent', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + formData.get('appkey'),
-                'Fengniaoao-Project': formData.get('appid')
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            resp.style.display = 'block'
-            jsonDisplay.textContent = JSON.stringify(data, null, 2);
-            if (data.code == 200) {
-                iframeUrl = data.result.url
-            }
-        })
-        .catch(error => {
-            resp.style.display = 'block'
-            jsonDisplay.textContent = error
-        });
+            fetch(BASE_URL + '/api/v1/getWebComponent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + formData.get('appkey'),
+                    'Fengniaoao-Project': formData.get('appid')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                resp.style.display = 'block'
+                jsonDisplay.textContent = JSON.stringify(data, null, 2);
+                if (data.code == 200) {
+                    iframeUrl = data.result.url
+                }
+            })
+            .catch(error => {
+                resp.style.display = 'block'
+                jsonDisplay.textContent = error
+            });
         })
         previewBtn.addEventListener('click', function(){
             iframe.src = iframeUrl
