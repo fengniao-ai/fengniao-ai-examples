@@ -149,8 +149,6 @@
             });
         })
         previewBtn.addEventListener('click', function(){
-            iframeUrl = 'http://localhost:3000/img/cutout?ts='+new Date().getTime()
-
             iframe.src = iframeUrl
             sdk.destroy()
             sdk.init(iframe, {
