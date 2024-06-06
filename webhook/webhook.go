@@ -17,7 +17,7 @@ import (
 // Constants for AES decryption
 const (
 	AESKey = "oFcTbSzdmOzXF2DZ72h9ILdLsXTE8qK1"
-	IV     = "aabbccdd11223344"
+	IV     = "IVa7b9f8d6e54gha"
 )
 
 // DecryptPayload function to decrypt the payload

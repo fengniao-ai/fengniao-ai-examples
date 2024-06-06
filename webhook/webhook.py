@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # Configuration for AES
 AES_KEY = b'oFcTbSzdmOzXF2DZ72h9ILdLsXTE8qK1'
-IV = b'aabbccdd11223344'
+IV = b'IVa7b9f8d6e54gha'
 
 def decrypt_payload(encrypted_data):
     backend = default_backend()

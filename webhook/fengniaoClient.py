@@ -41,7 +41,7 @@ def read_and_validate_json(filepath):
 
 
 def encrypt_payload(payload, api_key):
-    iv = b'aabbccdd11223344'  # Ensure this is exactly 16 bytes
+    iv = b'IVa7b9f8d6e54gha'  # Ensure this is exactly 16 bytes
     cipher = AES.new(api_key.encode('utf-8'), AES.MODE_CBC, iv)
     # Check if payload is already in byte form or needs encoding
     if isinstance(payload, str):

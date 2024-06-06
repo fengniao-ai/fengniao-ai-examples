@@ -7,7 +7,7 @@ const PORT = 3000;
 
 // Replace 'aesKey' and 'iv' with your actual AES key and IV
 const aesKey = Buffer.from('oFcTbSzdmOzXF2DZ72h9ILdLsXTE8qK1', 'utf-8');  // Ensure your key length matches AES-256 if using that
-const iv = Buffer.from('aabbccdd11223344', 'utf-8');  // Ensure this matches the IV length (16 bytes for AES)
+const iv = Buffer.from('IVa7b9f8d6e54gha', 'utf-8');  // Ensure this matches the IV length (16 bytes for AES)
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
