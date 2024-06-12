@@ -89,6 +89,14 @@ class FengniaoaiSDK {
         this.#retryPostMessage('fengn_check_ready', this.#maxRetries);
     }
 
+    // 更换产品图、场景图
+    updateData(data = {}) {
+        this.#sendMessage({
+            event: 'update_data',
+            payload: data
+        })
+    }
+
     //  销毁
     destroy(){
         this.#log('destroy')

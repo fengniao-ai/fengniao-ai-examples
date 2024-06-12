@@ -28,7 +28,7 @@
         }
 
         .btn{
-            width: 80px;
+            min-width: 80px;
             margin: 15px 0;
         }
         .input {
@@ -78,6 +78,7 @@
                     <input class="input" name="custom_data">
                 </div>
                 <button class="btn" id="previewBtn">点击预览</button>
+                <button class="btn" id="updateBtn">更换产品图或参考图</button>
             </div>
             <div id="iframeResp" class="resp-panel">
                 <p>执行返回值</p>
@@ -104,6 +105,7 @@
         var BASE_URL = env == 'uat' ? 'https://api.port2.cn' : 'https://api.fengniao.ai'
         var WEB_COMPONENT_NAME = 'img_product_by_reference';
         var previewBtn = document.getElementById('previewBtn');
+        var updateBtn = document.getElementById('updateBtn');
         var iframe = document.getElementById('iframe');
         var resp = document.getElementById('resp');
         var myForm = document.getElementById('myForm');
@@ -157,6 +159,8 @@
             });
         })
         previewBtn.addEventListener('click', function(){
+            // 本地测试
+            // iframeUrl = 'http://127.0.0.1:3000/scenes/a?ticket=FoIKfBXYzwSZ'
             iframe.src = iframeUrl
             sdk.destroy(),
             sdk.init(iframe, {
@@ -166,7 +170,14 @@
             }, (payload) => {
                 console.log('payload:', payload)
                 iframeResp.style.display = 'block'
-                resJsonDisplay.textContent = JSON.stringify(JSON.parse(payload), null, 2)
+                resJsonDisplay.textContent = JSON.stringify(payload, null, 2)
+            })
+        })
+
+        updateBtn.addEventListener('click', function() {
+            sdk.updateData({
+                product_img: productImg.value,
+                refer_img: referImg.value, 
             })
         })
     }
