@@ -70,6 +70,15 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	timestampFloat, _ := data["timestamp"].(float64)
+	timestamp := int(timestampFloat)
+	timestampStr := strconv.Itoa(timestamp)
+	if !verifySignature(data["payload"].(string), data["signature"].(string), data["project_id"].(string), timestampStr) {
+		fmt.Println("Invalid signature")
+		http.Error(w, "Invalid signature", http.StatusForbidden)
+		return
+	}
+
 	fmt.Println("Received webhook:", data)
 	decryptedMessage, err := DecryptPayload(data["payload"].(string))
 	if err != nil {
@@ -78,14 +87,6 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Decrypted payload:", decryptedMessage)
 
-	timestampFloat, _ := data["timestamp"].(float64)
-	timestamp := int(timestampFloat)
-	timestampStr := strconv.Itoa(timestamp)
-	if !verifySignature(decryptedMessage, data["signature"].(string), data["project_id"].(string), timestampStr) {
-		fmt.Println("Invalid signature")
-		http.Error(w, "Invalid signature", http.StatusForbidden)
-		return
-	}
 	// Add your signature verification logic here
 
 	fmt.Fprintf(w, "ok")

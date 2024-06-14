@@ -65,11 +65,7 @@ public class webhook {
               String payload = postData.getString("payload");
               //String payload = postData.getString("payload").replaceAll("\\s", "");  // Remove any spaces
 
-              System.out.println("payload: " + payload);
-              String decryptedMessage = decrypt(payload);
-              System.out.println("Decrypted message: " + decryptedMessage);
-
-              if (!verifySignature(decryptedMessage, postData.getString("signature"), postData.getString("project_id"), String.valueOf(postData.getInt("timestamp")))) {
+              if (!verifySignature(payload, postData.getString("signature"), postData.getString("project_id"), String.valueOf(postData.getInt("timestamp")))) {
                 System.out.println("Invalid signature");
 
                 OutputStream output = socket.getOutputStream();
@@ -82,6 +78,12 @@ public class webhook {
                 socket.close();
                 return;
               }
+
+              System.out.println("payload: " + payload);
+              String decryptedMessage = decrypt(payload);
+              System.out.println("Decrypted message: " + decryptedMessage);
+
+              
 
               OutputStream output = socket.getOutputStream();
               PrintWriter writer = new PrintWriter(output, true);

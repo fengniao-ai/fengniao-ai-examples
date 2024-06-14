@@ -37,15 +37,17 @@ function verifySignature(payload, signature, timestamp, projectId) {
 app.post('/webhook', (req, res) => {
     console.log('Received webhook:', req.body);
     
+    // Verify the signature
+    if (!verifySignature(req.body.payload, req.body.signature, req.body.timestamp, req.body.project_id)) {
+      console.log('Invalid signature');
+      return res.status(403).send('Invalid signature');
+    }
+
     // Assuming encrypted data comes as a hex string in the payload field
     const decryptedMessage = decryptPayload(req.body.payload);
     console.log('Decrypted payload:', decryptedMessage);
 
-    // Verify the signature
-    if (!verifySignature(decryptedMessage, req.body.signature, req.body.timestamp, req.body.project_id)) {
-      console.log('Invalid signature');
-      return res.status(403).send('Invalid signature');
-    }
+
 
     // Respond with a status of 200 and a simple message
     res.status(200).send('ok');

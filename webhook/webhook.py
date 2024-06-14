@@ -34,11 +34,13 @@ def webhook():
     data = request.get_json()
     try:
         print('Received webhook:', data)
-        decrypted_message = decrypt_payload(data['payload'])
-        print('Decrypted payload:', decrypted_message)
-        if not verify_signature(decrypted_message, data['signature'], data['timestamp'], data['project_id']):
+        if not verify_signature(data['payload'], data['signature'], data['timestamp'], data['project_id']):
             print('Invalid signature')
             return jsonify({"error": "Invalid signature"}), 403
+        
+        decrypted_message = decrypt_payload(data['payload'])
+        print('Decrypted payload:', decrypted_message)
+        
         return jsonify({"message": "ok"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

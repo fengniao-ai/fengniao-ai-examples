@@ -87,7 +87,8 @@ def main():
     
     encrypted_payload, iv = encrypt_payload(payload, api_key)
     timestamp = int(time.time())
-    signature = generate_signature(project_id, api_key, timestamp, payload)
+    signature = generate_signature(project_id, api_key, timestamp,  base64.b64encode(encrypted_payload).decode('utf-8'))
+    
     response = send_post_request(webhook_url, project_id, timestamp, signature, encrypted_payload, iv)
     if (response is None):
         print(f"Failed to send request to {webhook_url}")
