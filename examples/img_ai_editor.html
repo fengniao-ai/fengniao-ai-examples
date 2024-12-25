@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI编辑器</title>
+    <style>
+        html,body,p{
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            padding-left: 20px;
+            height: 100vh;
+        }
+        .l-panel {
+            width: 240px;
+            margin-right: 20px;
+            border-right: 1px solid rgb(93, 90, 90);
+            max-height: 100vh;
+            overflow: auto;
+        }
+        .doc, .resp-panel, .form  {
+            margin-bottom: 15px;
+        }
+        .resp-panel {
+            display: none;
+        }
+
+        .btn{
+            min-width: 80px;
+            margin: 15px 0;
+        }
+        .input {
+            width: 220px;
+        }
+        pre{
+            overflow: auto;
+        }
+
+        .r-panel {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="l-panel">
+            <form id="myForm" class="form">
+                <div class="form-item">
+                    <p>PROJET ID:</p>
+                    <input class="input" name="appid" type="text" value="" required>
+                </div>
+                <div class="form-item">
+                    <p>API KEY:</p>
+                    <input class="input" name="appkey" type="text" value="" required>
+                </div>
+                <div class="form-item">
+                    <p>存活时间(秒）:</p>
+                    <input class="input" name="expires_in" value="3600" type="number">
+                </div>
+                <button class="btn" id="generateBtn">生成</button>
+            </form>
+            <div id="resp" class="resp-panel">
+                <p>JSON 返回值</p>
+                <pre><code id="jsonDisplay"></code></pre>
+
+                <div class="form-item">
+                    <p>原始图片base64:</p>
+                    <input class="input" name="origin_img">
+                </div>
+                <div class="form-item">
+                    <p>自定义参数:</p>
+                    <input class="input" name="custom_data">
+                </div>
+                <button class="btn" id="previewBtn">点击预览</button>
+                <button class="btn" id="updateBtn">更换原始图片</button>
+            </div>
+            <div id="iframeResp" class="resp-panel">
+                <p>执行返回值</p>
+                <pre><code id="resJsonDisplay"></code></pre>
+            </div>
+            <div class="doc">
+                <a href="https://tn3e1qv394.feishu.cn/docx/L8Ood0M49odFyDxXSwoc99Sentg">API手册</a>
+                <a href="https://github.com/fengniao-ai/fengniao-ai-examples">下载demo</a>
+            </div>
+        </div>
+        <div class="r-panel">
+            <iframe id="iframe" src="" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+</body>
+<script src="./sdk.js"></script>
+<script>
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+    function pageLoaded(){
+        var env = getQueryParam('env')
+        var BASE_URL = env == 'uat' ? 'https://api.port2.cn' : 'https://api.fengniaoai.com'
+        var WEB_COMPONENT_NAME = 'img_ai_editor';
+        var previewBtn = document.getElementById('previewBtn');
+        var updateBtn = document.getElementById('updateBtn');
+        var iframe = document.getElementById('iframe');
+        var resp = document.getElementById('resp');
+        var myForm = document.getElementById('myForm');
+        var jsonDisplay = document.getElementById('jsonDisplay');
+        var iframeResp = document.getElementById('iframeResp');
+        var resJsonDisplay = document.getElementById('resJsonDisplay');
+        var originImg = document.querySelector('input[name="origin_img"]')
+        var customData = document.querySelector('input[name="custom_data"]')
+        var iframeUrl = ''
+        var sdk = new FengniaoaiSDK({
+            debug: true
+        })
+
+        document.querySelector('input[name="appid"]').value = getQueryParam('id')
+        document.querySelector('input[name="appkey"]').value = getQueryParam('key')
+
+        myForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            // 获取表单数据
+            var formData = new FormData(event.target);
+            var data = {
+                name: WEB_COMPONENT_NAME,
+                expires_in: formData.get('expires_in')
+            };
+            // 使用 fetch 提交表单数据
+            fetch(BASE_URL + '/api/v1/getWebComponent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + formData.get('appkey'),
+                    'Fengniaoai-Project': formData.get('appid')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                resp.style.display = 'block'
+                jsonDisplay.textContent = JSON.stringify(data, null, 2);
+                if (data.code == 200) {
+                    iframeUrl = data.result.url
+                }
+            })
+            .catch(error => {
+                resp.style.display = 'block'
+                jsonDisplay.textContent = error
+            });
+        })
+        previewBtn.addEventListener('click', function(){
+            iframe.src = iframeUrl
+            sdk.destroy(),
+            sdk.init(iframe, {
+                origin_img: originImg.value,
+                custom_data: customData.value,
+            }, (payload) => {
+                console.log('payload:', payload)
+                iframeResp.style.display = 'block'
+                resJsonDisplay.textContent = JSON.stringify(payload, null, 2)
+            })
+        })
+
+        updateBtn.addEventListener('click', function() {
+            sdk.updateData({
+                origin_img: originImg.value,
+            })
+        })
+    }
+    document.addEventListener('DOMContentLoaded', pageLoaded)
+
+</script>
+</html>
